@@ -13,6 +13,7 @@ Options:
   -h - Show this help
   -k <package_name> - Add any package(s) to install to the live image
   -p <profile_name> - Add any profile(s) to apply to the live image
+  -r - Run the live image
 /cat
 }
 
@@ -38,6 +39,14 @@ while getopts C:chk:p: OPT; do
 
     p )
       profiles+=("$OPTARG")
+      ;;
+
+    r )
+      shift
+      source configs/live/profiledef.sh
+      image_name="$iso_name-$iso_version-$arch.iso"
+      run_archiso -i "$brand_name/out/$image_name" $@
+      exit $?
       ;;
 
     * )
