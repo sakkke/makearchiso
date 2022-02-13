@@ -8,14 +8,19 @@ function show_help() {
 makearchiso - make archiso
 
 Options:
+  -C <config_path> - Set the configuration file path
   -h - Show this help
   -k <package_name> - Add any package(s) to install to the live image
   -p <profile_name> - Add any profile(s) to apply to the live image
 /cat
 }
 
-while getopts hk:p: OPT; do
+while getopts C:hk:p: OPT; do
   case $OPT in
+    C )
+      makearchiso_config="$OPTARG"
+      ;;
+
     h )
       show_help
       exit 0
@@ -35,7 +40,14 @@ while getopts hk:p: OPT; do
   esac
 done
 
-source makearchiso.config.sh
+makearchiso_config="${makearchiso_config:-makearchiso.config.sh}"
+
+if [[ -f $makearchiso_config ]]; then
+  source "$makearchiso_config"
+else
+  echo "$makearchiso_config not exists"
+  exit 5
+fi
 
 function show_progress() {
   local lineno=$1
