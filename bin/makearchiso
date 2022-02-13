@@ -9,16 +9,22 @@ makearchiso - make archiso
 
 Options:
   -C <config_path> - Set the configuration file path
+  -c - Clean up files
   -h - Show this help
   -k <package_name> - Add any package(s) to install to the live image
   -p <profile_name> - Add any profile(s) to apply to the live image
 /cat
 }
 
-while getopts C:hk:p: OPT; do
+while getopts C:chk:p: OPT; do
   case $OPT in
     C )
       makearchiso_config="$OPTARG"
+      ;;
+
+    c )
+      rm -fr "$TARGET" configs/_$brand_name
+      exit $?
       ;;
 
     h )
