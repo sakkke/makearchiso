@@ -63,8 +63,24 @@ cat > $mirrorlist << /cat
 Server = http://localhost:$httpd_port
 /cat
 
-while getopts k:p: OPT; do
+function show_help() {
+  cat << /cat
+makearchiso - make archiso
+
+Options:
+  -h - Show this help
+  -k <package_name> - Add any package(s) to install to the live image
+  -p <profile_name> - Add any profile(s) to apply to the live image
+/cat
+}
+
+while getopts hk:p: OPT; do
   case $OPT in
+    h )
+      show_help
+      exit 0
+      ;;
+
     k )
       packages+=("$OPTARG")
       ;;
