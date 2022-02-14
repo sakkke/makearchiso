@@ -2,6 +2,7 @@
 
 trap 'exit $?' INT
 
+aur_packages=()
 packages=()
 profiles=(baseline $brand_name live)
 
@@ -11,6 +12,7 @@ makearchiso - make archiso
 
 Options:
   -C <config_path> - Set the configuration file path
+  -K <aur_package_name> - Add any AUR package(s) to install to the live image
   -c - Clean up files
   -h - Show this help
   -k <package_name> - Add any package(s) to install to the live image
@@ -19,10 +21,14 @@ Options:
 /cat
 }
 
-while getopts C:chk:p: OPT; do
+while getopts C:K:chk:p: OPT; do
   case $OPT in
     C )
       makearchiso_config="$OPTARG"
+      ;;
+
+    K )
+      aur_packages+=("$OPTARG")
       ;;
 
     c )
@@ -91,14 +97,16 @@ fi
 WORK_DIR=$brand_name.work
 httpd_port=8888
 
+aur_work_dir=$(mktemp -d)
 config=$(mktemp)
 dbpath1=$(mktemp -d)
 dbpath2=$(mktemp -d)
+dbpath3=$(mktemp -d)
 live_repo=$(mktemp -d)
 mirrorlist=$(mktemp)
 pidfile=$(mktemp)
 
-trap "rm -fr $config $dbpath1 $dbpath2 $mirrorlist $pidfile $live_repo" EXIT
+trap "rm -fr $aur_work_dir $config $dbpath1 $dbpath2 $dbpath3 $mirrorlist $pidfile $live_repo" EXIT
 
 cat > $config << /cat
 [options]
@@ -133,6 +141,28 @@ mkdir -p configs/_$brand_name/airootfs/opt/$brand_name
 
 for package in ${packages[@]}; do
   echo "$package" >> configs/_$brand_name/packages.x86_64
+done
+
+for aur_package in ${aur_packages[@]}; do
+  echo "$aur_package" >> configs/_$brand_name/packages.x86_64
+  sudo -u termy-dev git clone "https://aur.archlinux.org/$aur_package.git" "$aur_work_dir/$aur_package"
+  pushd "$aur_work_dir/$aur_package"
+  sudo -u termy-dev makepkg --noconfirm -s
+  (
+    source PKGBUILD
+    pkgfile="$pkgname-$pkgver-$pkgrel-$(uname -m).pkg.tar.zst"
+    pacman \
+      --dbpath $dbpath3 \
+      --refresh \
+      --sync
+    pacman \
+      --dbpath $dbpath3 \
+      --downloadonly \
+      --noconfirm \
+      --upgrade \
+      "$pkgfile"
+  )
+  popd
 done
 
 for profile in ${profiles[@]}; do
@@ -171,6 +201,27 @@ darkhttpd $live_repo --port $httpd_port
       --refresh \
       --sync \
       - < configs/_$brand_name/airootfs/opt/$brand_name/pkgs
+
+    for aur_package in ${aur_packages[@]}; do
+      pushd "$aur_work_dir/$aur_package"
+      (
+        source PKGBUILD
+        pkgfile="$pkgname-$pkgver-$pkgrel-$(uname -m).pkg.tar.zst"
+        pacman \
+          --cachedir configs/_$brand_name/airootfs/opt/$brand_name/pkg \
+          --config $config \
+          --dbpath $dbpath2 \
+          --downloadonly \
+          --noconfirm \
+          --upgrade \
+          "$pkgfile"
+        cp "$pkgfile" configs/_$brand_name/airootfs/opt/$brand_name/pkg
+        repo-add configs/_$brand_name/airootfs/opt/$brand_name/pkg/{$brand_name.db.tar.gz,"$pkgfile"}
+      )
+      popd
+      rm -fr "$aur_work_dir/$aur_package"
+    done
+
     pkill -P $pid
     repo-add -n configs/_$brand_name/airootfs/opt/$brand_name/pkg/{$brand_name.db.tar.gz,*.pkg.tar.{xz,zst}}
     cat > configs/_$brand_name/pacman.conf << /cat
