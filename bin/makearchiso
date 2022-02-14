@@ -21,7 +21,7 @@ Options:
 /cat
 }
 
-while getopts C:K:chk:p: OPT; do
+while getopts C:K:chk:p:r OPT; do
   case $OPT in
     C )
       makearchiso_config="$OPTARG"
