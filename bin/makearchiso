@@ -219,7 +219,7 @@ done
 for profile in ${profiles[@]}; do
   if [[ $profile = _$brand_name ]]; then
     sort -uo configs/_$brand_name/packages.x86_64{,}
-    uniq -u configs/{_$brand_name,baseline}/packages.x86_64 > configs/_$brand_name/airootfs/opt/$brand_name/pkgs
+    sort configs/{_$brand_name,baseline}/packages.x86_64 | uniq -u > configs/_$brand_name/airootfs/opt/$brand_name/pkgs
     echo \
       base \
       linux \
