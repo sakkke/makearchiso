@@ -273,7 +273,7 @@ darkhttpd $live_repo --port $httpd_port
     done
 
     pkill -P $pid
-    repo-add configs/_$brand_name/airootfs/opt/$brand_name/pkg/{$brand_name.db.tar.gz,*.pkg.tar.{xz,zst}}
+    repo-add configs/_$brand_name/airootfs/opt/$brand_name/pkg/{$brand_name.db.tar.gz,*.pkg.tar.zst}
     cat > configs/_$brand_name/pacman.conf << /cat
 [options]
 Architecture = auto
