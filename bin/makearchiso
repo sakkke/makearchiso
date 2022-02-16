@@ -66,7 +66,7 @@ while getopts C:K:chk:p:r OPT; do
 
     c )
       source_config
-      rm -fr "$TARGET" configs/_$brand_name
+      rm -fr "$WORK_DIR" configs/_$brand_name
       exit $?
       ;;
 
