@@ -7,6 +7,15 @@ declare -A file_permissions=()
 makearchiso_config=makearchiso.config.sh
 packages=()
 
+function clean_work_dir() {
+  rm -fr "$WORK_DIR" configs/_$brand_name
+}
+
+function create_work_dir() {
+  mkdir "$WORK_DIR" configs/_$brand_name
+  mkdir -p configs/_$brand_name/airootfs/opt/$brand_name
+}
+
 function setup_development_environment() {
   pacman \
     --config "$OLDPWD/pacman.conf" \
@@ -66,7 +75,7 @@ while getopts C:K:chk:p:r OPT; do
 
     c )
       source_config
-      rm -fr "$WORK_DIR" configs/_$brand_name
+      clean_work_dir
       exit $?
       ;;
 
@@ -166,9 +175,8 @@ Server = http://localhost:$httpd_port
 
 profiles+=(_$brand_name)
 
-rm -fr "$WORK_DIR" configs/_$brand_name
-mkdir "$WORK_DIR" configs/_$brand_name
-mkdir -p configs/_$brand_name/airootfs/opt/$brand_name
+clean_work_dir
+create_work_dir
 
 for package in ${packages[@]}; do
   echo "$package" >> configs/_$brand_name/packages.x86_64
