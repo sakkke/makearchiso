@@ -7,12 +7,28 @@ declare -A file_permissions=()
 makearchiso_config=makearchiso.config.sh
 packages=()
 
+function setup_development_environment() {
+  pacman \
+    --config "$OLDPWD/pacman.conf" \
+    --needed \
+    --noconfirm \
+    --refresh \
+    --sync \
+    - << /pacman
+base
+base-devel
+darkhttpd
+/pacman
+  useradd termy-dev || :
+}
+
 function show_help() {
   cat << /cat
 makearchiso - make archiso
 
 Options:
   -C <config_path> - Set the configuration file path
+  -D - Setup development environment
   -K <aur_package_name> - Add any AUR package(s) to install to the live image
   -c - Clean up files
   -h - Show this help
@@ -41,6 +57,11 @@ while getopts C:K:chk:p:r OPT; do
 
     K )
       aur_packages+=("$OPTARG")
+      ;;
+
+    b )
+      setup_development_environment
+      exit $?
       ;;
 
     c )
