@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trap 'trap - DEBUG; exit $?' INT
+trap 'exit $?' INT
 
 aur_packages=()
 declare -A file_permissions=()
