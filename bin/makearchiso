@@ -29,6 +29,8 @@ function source_config() {
     echo "$makearchiso_config not exists"
     exit 5
   fi
+
+  WORK_DIR=$brand_name.work
 }
 
 while getopts C:K:chk:p:r OPT; do
@@ -42,6 +44,7 @@ while getopts C:K:chk:p:r OPT; do
       ;;
 
     c )
+      source_config
       rm -fr "$TARGET" configs/_$brand_name
       exit $?
       ;;
@@ -102,7 +105,6 @@ if ((EUID)); then
   exit 4
 fi
 
-WORK_DIR=$brand_name.work
 httpd_port=8888
 
 aur_work_dir=$(sudo -u termy-dev mktemp -d)
