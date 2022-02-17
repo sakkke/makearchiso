@@ -183,7 +183,6 @@ for package in ${packages[@]}; do
 done
 
 for aur_package in ${aur_packages[@]}; do
-  echo "$aur_package" >> configs/_$brand_name/packages.x86_64
   sudo -u termy-dev sh -c "cd $aur_work_dir && git clone 'https://aur.archlinux.org/$aur_package.git' '$aur_package'"
   cd "$aur_work_dir/$aur_package"
   (
@@ -254,6 +253,7 @@ darkhttpd $live_repo --port $httpd_port
       - < configs/_$brand_name/airootfs/opt/$brand_name/pkgs
 
     for aur_package in ${aur_packages[@]}; do
+      echo "$aur_package" >> configs/_$brand_name/packages.x86_64
       cd "$aur_work_dir/$aur_package"
       (
         source PKGBUILD
