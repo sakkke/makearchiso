@@ -58,19 +58,19 @@ function source_config() {
   WORK_DIR=$brand_name.work
 }
 
-while getopts C:K:chk:p:r OPT; do
+while getopts C:DK:chk:p:r OPT; do
   case $OPT in
     C )
       makearchiso_config="$OPTARG"
       ;;
 
-    K )
-      aur_packages+=("$OPTARG")
-      ;;
-
-    b )
+    D )
       setup_development_environment
       exit $?
+      ;;
+
+    K )
+      aur_packages+=("$OPTARG")
       ;;
 
     c )
