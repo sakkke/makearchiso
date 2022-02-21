@@ -189,12 +189,18 @@ for aur_package in ${aur_packages[@]}; do
     source PKGBUILD
 
     if [[ ${#depends[@]} -ge 1 ]]; then
+      depend_packages=()
+
+      for depend in ${depends[@]}; do
+        depend_packages+=("$(sed 's/[<>]=.*//g' <<< "$depend")")
+      done
+
       pacman \
         --config "$OLDPWD/pacman.conf" \
         --needed \
         --noconfirm \
         --sync \
-        "${depends[@]}"
+        "${depend_packages[@]}"
     fi
 
     sudo -u termy-dev makepkg --noconfirm
