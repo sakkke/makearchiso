@@ -2,7 +2,7 @@
 
 trap 'exit $?' INT
 
-aur_packages=(obmenu-generator)
+aur_packages=()
 declare -A file_permissions=()
 makearchiso_config=makearchiso.config.sh
 packages=()
