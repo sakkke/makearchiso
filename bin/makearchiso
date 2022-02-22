@@ -4,6 +4,7 @@ trap 'exit $?' INT
 
 aur_packages=()
 declare -A file_permissions=()
+declare -A live_repo_includes=()
 makearchiso_config=makearchiso.config.sh
 packages=()
 
@@ -222,11 +223,11 @@ for profile in ${profiles[@]}; do
   if [[ $profile = _$brand_name ]]; then
     sort -uo configs/_$brand_name/packages.x86_64{,}
     sort configs/{_$brand_name,baseline}/packages.x86_64 | uniq -u > configs/_$brand_name/airootfs/opt/$brand_name/pkgs
-    echo \
-      base \
-      linux \
-      linux-firmware \
-      | xargs -n1 >> configs/_$brand_name/airootfs/opt/$brand_name/pkgs
+
+    for live_repo_include in ${live_repo_includes[@]}; do
+      printf '%s\n' "$live_repo_include" >> configs/_$brand_name/airootfs/opt/$brand_name/pkgs
+    done
+
     sort -o configs/_$brand_name/airootfs/opt/$brand_name/pkgs{,}
     pacman \
       --config pacman.conf \
