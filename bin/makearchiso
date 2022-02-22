@@ -39,11 +39,11 @@ makearchiso - make archiso
 Options:
   -C <config_path> - Set the configuration file path
   -D - Setup development environment
-  -K <aur_package_name> - Add any AUR package(s) to install to the live image
+  -K <aur_package_name> - Add any AUR package to install to the live image
   -c - Clean up files
   -h - Show this help
-  -k <package_name> - Add any package(s) to install to the live image
-  -p <profile_name> - Add any profile(s) to apply to the live image
+  -k <package_name> - Add any package to install to the live image
+  -p <profile_name> - Add any profile to apply to the live image
   -r - Run the live image
 /cat
 }
