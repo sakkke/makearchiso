@@ -250,11 +250,10 @@ for aur_package in ${aur_depend_packages[@]}; do
       --dbpath $dbpath3 \
       --refresh \
       --sync
-    pacman \
+    yes y$'\n'1 | pacman \
       --config "$OLDPWD/pacman.conf" \
       --dbpath $dbpath3 \
       --downloadonly \
-      --noconfirm \
       --upgrade \
       "$pkgfile"
     pacman \
@@ -292,11 +291,10 @@ for aur_package in ${aur_packages[@]}; do
       --dbpath $dbpath3 \
       --refresh \
       --sync
-    pacman \
+    yes y$'\n'1 | pacman \
       --config "$OLDPWD/pacman.conf" \
       --dbpath $dbpath3 \
       --downloadonly \
-      --noconfirm \
       --upgrade \
       "$pkgfile"
   )
