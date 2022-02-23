@@ -345,7 +345,7 @@ darkhttpd $live_repo --port $httpd_port
       cd "$aur_work_dir/$aur_package"
       (
         source PKGBUILD
-        pkgfile="$pkgname-$pkgver-$pkgrel-$(uname -m).pkg.tar.zst"
+        pkgfile="$pkgname-$pkgver-$pkgrel-$([[ ${arch[0]} = any ]] && printf %s any || uname -m).pkg.tar.zst"
         pacman \
           --cachedir configs/_$brand_name/airootfs/opt/$brand_name/pkg \
           --config $config \
