@@ -2,6 +2,7 @@
 
 trap 'exit $?' INT
 
+aur_build_depend_packages=()
 aur_packages=()
 aur_depend_packages=()
 declare -A file_permissions=()
@@ -40,6 +41,7 @@ makearchiso - make archiso
 Options:
   -C <config_path> - Set the configuration file path
   -D - Setup development environment
+  -J <aur_package_name> - Add any AUR package as build dependency
   -K <aur_package_name> - Add any AUR package to install to the live image
   -L <aur_package_name> - Add any AUR package as dependency
   -c - Clean up files
@@ -61,7 +63,7 @@ function source_config() {
   WORK_DIR=$brand_name.work
 }
 
-while getopts C:DK:L:chk:p:r OPT; do
+while getopts C:DJ:K:L:chk:p:r OPT; do
   case $OPT in
     C )
       makearchiso_config="$OPTARG"
@@ -70,6 +72,10 @@ while getopts C:DK:L:chk:p:r OPT; do
     D )
       setup_development_environment
       exit $?
+      ;;
+
+    J )
+      aur_build_depend_packages+=("$OPTARG")
       ;;
 
     K )
@@ -187,6 +193,36 @@ create_work_dir
 
 for package in ${packages[@]}; do
   echo "$package" >> configs/_$brand_name/packages.x86_64
+done
+
+for aur_package in ${aur_build_depend_packages[@]}; do
+  sudo -u termy-dev sh -c "cd $aur_work_dir && git clone 'https://aur.archlinux.org/$aur_package.git' '$aur_package'"
+  cd "$aur_work_dir/$aur_package"
+  (
+    source PKGBUILD
+
+    if [[ ${#depends[@]} -ge 1 ]]; then
+      for depend in ${depends[@]}; do
+        depend_package="$(sed 's/[<>]=.*//g' <<< "$depend")"
+        pacman \
+          --config "$OLDPWD/pacman.conf" \
+          --needed \
+          --noconfirm \
+          --sync \
+          "$depend_package"
+      done
+    fi
+
+    sudo -u termy-dev makepkg --noconfirm
+    pkgfile="$pkgname-$pkgver-$pkgrel-$([[ ${arch[0]} = any ]] && printf %s any || uname -m).pkg.tar.zst"
+    pacman \
+      --config "$OLDPWD/pacman.conf" \
+      --needed \
+      --noconfirm \
+      --upgrade \
+      "$pkgfile"
+  )
+  cd -
 done
 
 for aur_package in ${aur_depend_packages[@]}; do
