@@ -342,6 +342,7 @@ darkhttpd $live_repo --port $httpd_port
 
     for aur_package in ${aur_depend_packages[@]} ${aur_packages[@]}; do
       echo "$aur_package" >> configs/_$brand_name/packages.x86_64
+      sort -o configs/_$brand_name/packages.x86_64{,}
       cd "$aur_work_dir/$aur_package"
       (
         source PKGBUILD
