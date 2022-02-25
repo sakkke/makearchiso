@@ -405,6 +405,6 @@ Server = file://$PWD/configs/_$brand_name/airootfs/opt/$brand_name/pkg
 done
 
 mkdir -p configs/_$brand_name/airootfs/etc
-printf '%s\n' "$*" > configs/_$brand_name/airootfs/etc/makearchiso.args
+printf '%s\n' "$*" > "$WORK_DIR/airootfs/etc/makearchiso.args"
 mkarchiso -o "$WORK_DIR/out" -v -w "$WORK_DIR/work" "$WORK_DIR"
 trap - DEBUG
