@@ -9,6 +9,7 @@ declare -A file_permissions=()
 declare -A live_repo_includes=()
 makearchiso_config=makearchiso.config.sh
 packages=()
+profiles=()
 
 function clean_work_dir() {
   rm -fr "$WORK_DIR" configs/_$brand_name
@@ -124,7 +125,7 @@ bash_source="$(realpath "$BASH_SOURCE")"
 
 source_config
 
-profiles=(baseline $brand_name live)
+profiles=(baseline $brand_name live ${profiles[@]})
 
 function show_progress() {
   local lineno=$1
